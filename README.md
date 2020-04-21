@@ -204,5 +204,62 @@ void assemblyK(element e,Matrix localK,Matrix &K,int nnodes){
 }
 ```
 
+### Cambios en tools.h
+Se preparan localmente arreglos para guardar por separado las condiciones de Dirichlet para la velocidad y las de la presion.
+
+```cpp
+condition *dirichlet_u_list;
+condition *dirichlet_p_list;
+```
+Se actualizan los datos de las condiciones de Dirichlet de la presión
+Se unen los arreglos locales de las condiciones de Dirichlet
+Se corrijen los valores de las condiciones
+
+```cpp
+updateConditionNodes(ndirich_p,dirichlet_p_list,nnodes);
+joinConditions(m.getDirichlet(),ndirich_u,ndirich_p,dirichlet_u_list,dirichlet_p_list);
+correctConditions(ndirich_u+ndirich_p,m.getDirichlet());
+```
+
+Se agrega una funcion que actualice el indice de todas las condiciones de Dirichlet
+para la presion, tomando en cuenta que si una condicion esta en el nodo p, en la matriz
+global correspondera a la posicion p+n, donde n es el total de nodos.
+
+```cpp
+void updateConditionNodes(int n,condition * list,int delta){
+    for(int i=0;i<n;i++)
+        list[i].setNode1(list[i].getNode1()+delta);
+}
+```
+
+Se agrega una función que una las condiciones de Dirichlet para la velocidad, y las condiciones de Dirichlet para la presión, de forma que sean un solo conjunto de condiciones.
+
+```cpp
+void joinConditions(condition *list,int n1,int n2,condition *list1,condition *list2){
+    int i;
+    for(i=0;i<n1;i++)
+        list[i] = list1[i];
+    for(int j=0;j<n2;j++){
+        list[i] = list2[j];
+        i++;
+    }
+}
+```
+Se agrega una función que modifique los nodos de las condiciones de Dirichlet, de forma que cada
+condición tome en cuenta la aplicación de la condición anterior.
+
+```cpp
+void correctConditions(int n,condition *list){
+    for(int i=0;i<n-1;i++){
+        int pivot = list[i].getNode1();
+        for(int j=i;j<n;j++)
+            /*Si la condición actual corresponde a un nodo posterior al nodo eliminado por
+            aplicar la condición anterior, se debe actualizar su posición.*/
+            if(list[j].getNode1()>pivot)
+                list[j].setNode1(list[j].getNode1()-1);
+    }
+}
+```
+
 <hr>
 <p align="center">Para servirles, <strong>Equipo de Instructores</strong> </p>
