@@ -126,5 +126,83 @@ void createLocalD(Matrix &D,mesh m){
 }
 ```
 
+Se actualiza la funcion para reflejar la nueva estructura de la matrix local K
+
+```cpp
+Matrix createLocalK(int element,mesh &m){
+    Matrix K,A,B,C,D;
+
+    zeroes(A,2);
+    zeroes(B,2);
+    zeroes(C,2);
+    zeroes(D,2);
+    createLocalA(A,m);
+    createLocalB(B,m);
+    createLocalC(C,m);
+    createLocalD(D,m);
+
+    Vector row1, row2, row3, row4;
+}
+```
+
+Se construyen las filas de la matriz K de acuerdo a su configuracion interna
+
+![equation](https://latex.codecogs.com/gif.latex?\begin{pmatrix}&space;A&plus;B&space;&&space;C\\&space;D&space;&&space;0&space;\end{pmatrix})
+
+```cpp
+    row1.push_back(A.at(0).at(0)+B.at(0).at(0)); 
+    row1.push_back(A.at(0).at(1)+B.at(0).at(1));
+    row1.push_back(C.at(0).at(0));                  
+    row1.push_back(C.at(0).at(1));
+
+    row2.push_back(A.at(1).at(0)+B.at(1).at(0)); 
+    row2.push_back(A.at(1).at(1)+B.at(1).at(1));
+    row2.push_back(C.at(1).at(0)); 
+    row2.push_back(C.at(1).at(1));
+
+    row3.push_back(D.at(0).at(0)); 
+    row3.push_back(D.at(0).at(1));
+    row3.push_back(0); 
+    row3.push_back(0);
+
+    row4.push_back(D.at(1).at(0)); 
+    row4.push_back(D.at(1).at(1));
+    row4.push_back(0); 
+    row4.push_back(0);
+
+    K.push_back(row1); 
+    K.push_back(row2); 
+    K.push_back(row3); 
+    K.push_back(row4);
+```
+
+Se actualiza la construccion de la b local de acuerdo a su nueva estructura
+
+```cpp
+Vector createLocalb(int element,mesh &m){
+    Vector b;
+
+    float f = m.getParameter(EXTERNAL_FORCE), l = m.getParameter(ELEMENT_LENGTH);
+    
+    b.push_back(f*l/2); 
+    b.push_back(f*l/2); 
+    b.push_back(0); 
+    b.push_back(0);
+
+    return b;
+}
+```
+Al momento de ensamblar, para los índices de la presión se toma en cuenta el desplazamiento al estar todas las presiones 
+después de todas las velocidades
+
+```cpp
+void assemblyK(element e,Matrix localK,Matrix &K,int nnodes){
+    int index1 = e.getNode1() - 1;
+    int index2 = e.getNode2() - 1;
+    int index3 = index1 + nnodes;
+    int index4 = index2 + nnodes;
+}
+```
+
 <hr>
 <p align="center">Para servirles, <strong>Equipo de Instructores</strong> </p>
