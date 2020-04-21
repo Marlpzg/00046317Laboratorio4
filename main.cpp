@@ -1,8 +1,10 @@
 #include <iostream>
 #include "math_tools.h"
 #include "classes.h"
+#include "display_tools.h"
 #include "tools.h"
 #include "sel.h"
+
 
 int main()
 {
@@ -22,21 +24,23 @@ int main()
     leerMallayCondiciones(m);
 
     crearSistemasLocales(m,localKs,localbs);
-    showKs(localKs); showbs(localbs);
-
+    
     zeroes(K,m.getSize(NODES)*2);
     zeroes(b,m.getSize(NODES)*2);
     ensamblaje(m,localKs,localbs,K,b);
-    showMatrix(K); showVector(b);
-
     
+
+    //Solo se aplica Dirichlet, no habra condiciones de Neumann
     applyDirichlet(m,K,b);
-    showMatrix(K); showVector(b);
+    
+    showMatrix(K);
 
     zeroes(T,b.size());
+
     calculate(K,b,T);
 
-    cout << "La respuesta es: \n";
+    cout << "La respuesta es: " << endl;
+    
     showVector(T);
 
     return 0;
