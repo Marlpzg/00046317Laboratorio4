@@ -66,7 +66,7 @@ class mesh{
             parameters[DENSITY]=rho;
             parameters[EXTERNAL_FORCE]=f;
         }
-   }   
+   }
 ```
 
 ### Cambios en problem.msh
@@ -92,7 +92,39 @@ DirichletP
 EndDirichletP
 ```
 
+### Cambios en sel.h
 
+Codificamos nuestras nuevas matrices
+
+```cpp
+//Matriz resultante de la aplicacion del MEF al termino convectivo
+void createLocalA(Matrix &A,mesh m){
+    float u_bar = m.getParameter(ADJECTIVE_VELOCITY);
+    A.at(0).at(0) += -u_bar/2;  A.at(0).at(1) += u_bar/2;
+    A.at(1).at(0) += -u_bar/2;  A.at(1).at(1) += u_bar/2;
+}
+
+//Matriz resultante de la aplicacion del MEF al termino relacionado a la viscosidad
+void createLocalB(Matrix &B,mesh m){
+    float l = m.getParameter(ELEMENT_LENGTH);
+    float nu = m.getParameter(DYNAMIC_VISCOSITY);
+    B.at(0).at(0) += nu/l;      B.at(0).at(1) += -nu/l;
+    B.at(1).at(0) += -nu/l;     B.at(1).at(1) += nu/l;
+}
+
+//Matriz resultante de la aplicacion del MEF al termino de la presion
+void createLocalC(Matrix &C,mesh m){
+    float rho = m.getParameter(DENSITY);
+    C.at(0).at(0) += -1/(2*rho);    C.at(0).at(1) += 1/(2*rho);
+    C.at(1).at(0) += -1/(2*rho);    C.at(1).at(1) += 1/(2*rho);
+}
+
+//Matriz resultante de la aplicacion del MEF al termino de la divergencia
+void createLocalD(Matrix &D,mesh m){
+    D.at(0).at(0) += -0.5;  D.at(0).at(1) += 0.5;
+    D.at(1).at(0) += -0.5;  D.at(1).at(1) += 0.5;
+}
+```
 
 <hr>
 <p align="center">Para servirles, <strong>Equipo de Instructores</strong> </p>
