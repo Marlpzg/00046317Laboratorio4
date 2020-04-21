@@ -147,7 +147,7 @@ Matrix createLocalK(int element,mesh &m){
 
 Se construyen las filas de la matriz K de acuerdo a su configuracion interna
 
-![equation](https://latex.codecogs.com/gif.latex?\begin{pmatrix}&space;A&plus;B&space;&&space;C\\&space;D&space;&&space;0&space;\end{pmatrix})
+![equation](https://latex.codecogs.com/gif.latex\begin{pmatrix}&space;A&plus;B&space;&&space;C\\&space;D&space;&&space;0&space;\end{pmatrix})
 
 ```cpp
     row1.push_back(A.at(0).at(0)+B.at(0).at(0)); 
